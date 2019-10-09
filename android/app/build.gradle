@@ -48,12 +48,20 @@ def keystoreProperties = new Properties()
     }
 
       signingConfigs {
-       release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile file(keystoreProperties['storeFile'])
-           storePassword keystoreProperties['storePassword']
-       }
+      
+        release {
+            if (System.getenv()["CI"]) { // CI=true is exported by Nevercode
+                storeFile file(System.getenv()["NC_KEYSTORE_PATH"])
+                storePassword System.getenv()["NC_KEYSTORE_PASSWORD"]
+                keyAlias System.getenv()["NC_KEY_ALIAS"]
+                keyPassword System.getenv()["NC_KEY_PASSWORD"]
+            } else {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
    }
    buildTypes {
        release {
